@@ -1,0 +1,12 @@
+.table-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: auto;
+}
+
+.table-title {
+  display: flex;
+  gap: 60px;
+}
