@@ -1,4 +1,4 @@
-VISIT AND TRY => [https://cherdak-pavlo.github.io/library/](url)
+VISIT AND TRY => https://cherdak-pavlo.github.io/library
 
 #Overview
 The Books Management System is a React-based application that allows users to manage a collection of books. Users can view, sort, filter, update, and delete books, as well as download the data in JSON format. The application also provides functionalities to add new books with validation and dynamic author management.
