@@ -1,9 +1,9 @@
 import "./MainPage.css";
 import React, { useContext, useState } from "react";
-import { Info } from "../types/Info";
-import { base } from "../api/base";
-import { BookContext } from "../context/InfoProvider";
-import { Loader } from "./Loader";
+import { Info } from "../../types/Info";
+import { base } from "../../api/base";
+import { BookContext } from "../../context/InfoProvider";
+import { Loader } from "../Loader";
 import classNames from "classnames";
 
 export const MainPage: React.FC = () => {
@@ -12,6 +12,8 @@ export const MainPage: React.FC = () => {
   const [loader, setLoader] = useState<string | null>(null);
   const [filterAuthor, setFilterAuthor] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"name" | "author" | null>(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+  const [InfoIdToDelete, setInfoIdToDelete] = useState<string | null>(null);
 
   const handleAuthorClick = (personName: Info | null) => {
     setFilterAuthor(personName ? personName.author : null);
@@ -27,18 +29,32 @@ export const MainPage: React.FC = () => {
       )
     : filteredBooks;
 
-  const handleDeleteBook = (bookId: string) => {
-    setLoader(bookId);
-    base("Table 1").destroy(bookId, function (error: any) {
-      if (error) {
-        console.error(error);
-        return;
-      }
+  const handleDeleteInfo = (infoId: string | null) => {
+    setInfoIdToDelete(infoId);
+    setIsConfirmModalOpen(true);
+  };
 
-      setBooks((currentState) => currentState.filter((el) => el.id !== bookId));
+  const deleteInfo = () => {
+    if (InfoIdToDelete) {
+      setLoader(InfoIdToDelete);
+      base("Table 1").destroy(InfoIdToDelete, function (error: any) {
+        if (error) {
+          console.error(error);
+          return;
+        }
 
-      setLoader(null);
-    });
+        setBooks((currentState) =>
+          currentState.filter((el) => el.id !== InfoIdToDelete)
+        );
+
+        setLoader(null);
+        setIsConfirmModalOpen(false);
+        setInfoIdToDelete(null);
+      });
+    } else {
+      setIsConfirmModalOpen(false);
+      handleDeleteAuthor();
+    }
   };
 
   const handleDeleteAuthor = async () => {
@@ -76,6 +92,9 @@ export const MainPage: React.FC = () => {
     } finally {
       setLoading(false);
       handleAuthorClick(null);
+      setLoader(null);
+      setIsConfirmModalOpen(false);
+      setInfoIdToDelete(null);
     }
   };
 
@@ -101,7 +120,9 @@ export const MainPage: React.FC = () => {
   return (
     <div data-cy="BooksList" className="table-container">
       <div className="table-title">
-        <h1 className="title article-title">Books</h1>
+        <h1 className="title article-title">
+          {filterAuthor ? `${filterAuthor}'s books` : "Books"}
+        </h1>
 
         <div className="select">
           <select
@@ -123,6 +144,40 @@ export const MainPage: React.FC = () => {
           </button>
         </div>
       </div>
+      {isConfirmModalOpen && (
+        <div className="modal is-active">
+          <div
+            className="modal-background"
+            onClick={() => setIsConfirmModalOpen(false)}
+          ></div>
+          <div className="modal-content modal-delete-book">
+            <div className="box">
+              <h1 className="title is-5">
+                {InfoIdToDelete
+                  ? "Are you sure you want to delete this record?"
+                  : "Are you sure you want to delete this author?"}
+              </h1>
+              <div className="buttons">
+                <button className="button is-danger" onClick={deleteInfo}>
+                  Yes
+                </button>
+                <button
+                  className="button is-light"
+                  onClick={() => setIsConfirmModalOpen(false)}
+                >
+                  No
+                </button>
+              </div>
+              <button
+                className="modal-close is-large"
+                aria-label="close"
+                onClick={() => setIsConfirmModalOpen(false)}
+              ></button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <Loader />
       ) : (
@@ -151,7 +206,7 @@ export const MainPage: React.FC = () => {
                   <td data-cy="PostTitle">{info.annotation}</td>
                   <td data-cy="PostUpdate">
                     <button
-                      className={classNames("button is-warning", {
+                      className={classNames("button is-warning is-small", {
                         "is-light": loader === info.id ? false : true,
                       })}
                       onClick={() => handleUpdateInfo(info)}
@@ -162,10 +217,10 @@ export const MainPage: React.FC = () => {
                   </td>
                   <td data-cy="PostDelete">
                     <button
-                      className={classNames("button is-danger", {
+                      className={classNames("button is-danger is-small", {
                         "is-light": loader === info.id ? false : true,
                       })}
-                      onClick={() => handleDeleteBook(info.id)}
+                      onClick={() => handleDeleteInfo(info.id)}
                       disabled={loader === info.id}
                     >
                       Delete
@@ -185,7 +240,7 @@ export const MainPage: React.FC = () => {
               </button>
               <button
                 className="button is-link is-danger"
-                onClick={handleDeleteAuthor}
+                onClick={() => handleDeleteInfo(null)}
               >
                 Delete author
               </button>
