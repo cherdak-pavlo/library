@@ -6,7 +6,8 @@ import { BookContext } from "../../context/InfoProvider";
 import classNames from "classnames";
 
 export const AddEditInfo: React.FC = () => {
-  const { books, setBooks, updateInfo, setUpdateInfo } = useContext(BookContext);
+  const { books, setBooks, updateInfo, setUpdateInfo } =
+    useContext(BookContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [createAuthor, setCreateAuthor] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -22,10 +23,12 @@ export const AddEditInfo: React.FC = () => {
     author: false,
     annotation: false,
   });
-  
 
   const uniqueAuthors = books.reduce<Info[]>((acc, book) => {
-    if (book.author.trim() && !acc.some(item => item.author === book.author)) {
+    if (
+      book.author.trim() &&
+      !acc.some((item) => item.author === book.author)
+    ) {
       acc.push(book);
     }
     return acc;
@@ -46,6 +49,7 @@ export const AddEditInfo: React.FC = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setUpdateInfo(null);
+    setCreateAuthor(false);
     setError({
       name: false,
       author: false,
@@ -65,13 +69,6 @@ export const AddEditInfo: React.FC = () => {
       ...currentState,
       author: event.target.value,
     }));
-  };
-
-  const deleteDataForm = () => {
-    setNewInfo({ name: "", author: "", annotation: "" });
-    if (updateInfo) {
-      setUpdateInfo(null);
-    }
   };
 
   const handleInput = (
@@ -158,10 +155,14 @@ export const AddEditInfo: React.FC = () => {
       );
     }
 
-    deleteDataForm();
+    setNewInfo({ name: "", author: "", annotation: "" });
     setIsLoading(false);
     setCreateAuthor(false);
     handleCloseModal();
+
+    if (updateInfo) {
+      setUpdateInfo(null);
+    }
   };
 
   return (
@@ -176,16 +177,16 @@ export const AddEditInfo: React.FC = () => {
       </div>
 
       <div className={classNames("modal", { "is-active": isModalOpen })}>
-        <div
-          className="modal-background"
-          onClick={() => handleCloseModal()}
-        ></div>
+        <div className="modal-background" onClick={handleCloseModal}></div>
         <div className="modal-content">
+          <h1 className="title" style={{ color: "white", cursor: "default" }}>
+            {updateInfo ? "Update Record" : "New Record"}
+          </h1>
           <div className="box">
             <button
               className="delete is-large"
               aria-label="close"
-              onClick={() => handleCloseModal()}
+              onClick={handleCloseModal}
               style={{ position: "absolute", top: "10px", right: "10px" }}
             ></button>
             <form
@@ -231,7 +232,7 @@ export const AddEditInfo: React.FC = () => {
                 </label>
                 <div className="control">
                   {!createAuthor ? (
-                    <div className="select">
+                    <div className="select is-fullwidth">
                       <select
                         name="author"
                         id="annotation-author"
@@ -244,7 +245,7 @@ export const AddEditInfo: React.FC = () => {
                           <option key={el.author} value={el.author}>
                             {el.author}
                           </option>
-                        ))} 
+                        ))}
                         <option value="custom">Or type your own...</option>
                       </select>
                     </div>
@@ -291,23 +292,25 @@ export const AddEditInfo: React.FC = () => {
                   </p>
                 )}
               </div>
-              <div className="field is-grouped">
+              <div className="field is-grouped" style={{ marginTop: "20px" }}>
                 <div className="control">
                   <button
+                    style={{ width: "80px" }}
                     type="submit"
                     className="button is-link"
                     disabled={isLoading}
                   >
-                    {updateInfo ? "Update" : "Add"}
+                    {updateInfo ? "Update" : "Save"}
                   </button>
                 </div>
                 <div className="control">
                   <button
+                    style={{ width: "80px" }}
                     type="reset"
                     className="button is-link is-light"
-                    onClick={deleteDataForm}
+                    onClick={handleCloseModal}
                   >
-                    Clear
+                    Cancel
                   </button>
                 </div>
               </div>

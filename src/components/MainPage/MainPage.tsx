@@ -36,6 +36,7 @@ export const MainPage: React.FC = () => {
 
   const deleteInfo = () => {
     if (InfoIdToDelete) {
+      setIsConfirmModalOpen(false);
       setLoader(InfoIdToDelete);
       base("Table 1").destroy(InfoIdToDelete, function (error: any) {
         if (error) {
@@ -48,7 +49,6 @@ export const MainPage: React.FC = () => {
         );
 
         setLoader(null);
-        setIsConfirmModalOpen(false);
         setInfoIdToDelete(null);
       });
     } else {
@@ -121,7 +121,7 @@ export const MainPage: React.FC = () => {
     <div data-cy="BooksList" className="table-container">
       <div className="table-title">
         <h1 className="title article-title">
-          {filterAuthor ? `${filterAuthor}'s books` : "Books"}
+          {filterAuthor ? `${filterAuthor} books` : "Books"}
         </h1>
 
         <div className="select">
@@ -157,13 +157,25 @@ export const MainPage: React.FC = () => {
                   ? "Are you sure you want to delete this record?"
                   : "Are you sure you want to delete this author?"}
               </h1>
-              <div className="buttons">
-                <button className="button is-danger" onClick={deleteInfo}>
+              <div
+                className="buttons"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginBottom: "0",
+                }}
+              >
+                <button
+                  className="button is-danger"
+                  onClick={deleteInfo}
+                  style={{ width: "60px" }}
+                >
                   Yes
                 </button>
                 <button
                   className="button is-light"
                   onClick={() => setIsConfirmModalOpen(false)}
+                  style={{ width: "60px" }}
                 >
                   No
                 </button>
@@ -206,7 +218,8 @@ export const MainPage: React.FC = () => {
                   <td data-cy="PostTitle">{info.annotation}</td>
                   <td data-cy="PostUpdate">
                     <button
-                      className={classNames("button is-warning is-small", {
+                      style={{ width: "65px" }}
+                      className={classNames("button is-small small-button", {
                         "is-light": loader === info.id ? false : true,
                       })}
                       onClick={() => handleUpdateInfo(info)}
@@ -217,9 +230,13 @@ export const MainPage: React.FC = () => {
                   </td>
                   <td data-cy="PostDelete">
                     <button
-                      className={classNames("button is-danger is-small", {
-                        "is-light": loader === info.id ? false : true,
-                      })}
+                      style={{ width: "65px" }}
+                      className={classNames(
+                        "button is-link is-light is-small",
+                        {
+                          "is-light": loader === info.id ? false : true,
+                        }
+                      )}
                       onClick={() => handleDeleteInfo(info.id)}
                       disabled={loader === info.id}
                     >
